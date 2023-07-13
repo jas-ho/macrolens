@@ -7,9 +7,13 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-langchain = "^0.0.231"
+langchain = "^0.0.136"
 transformers = "^4.30.2"
 tqdm = "^4.65.0"
+gymnasium = "^0.28.1"
+pettingzoo = "^1.23.1"
+python-dotenv = "^1.0.0"
+querychains = {git = "ssh://git@github.com/acsresearch/querychains.git", rev = "main"}
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.0"
