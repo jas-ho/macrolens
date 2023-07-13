@@ -904,22 +904,6 @@ files = [
 gitdb = ">=4.0.1,<5"
 
 [[package]]
-name = "gptcache"
-version = "0.1.35"
-description = "GPTCache, a powerful caching library that can be used to speed up and lower the cost of chat applications that rely on the LLM service. GPTCache works as a memcache for AIGC applications, similar to how Redis works for traditional applications."
-optional = false
-python-versions = ">=3.8.1"
-files = [
-    {file = "gptcache-0.1.35-py3-none-any.whl", hash = "sha256:cb51751a4008762f87cbf7b5c795014a94c250b0fd3ba7b24f93008a16ecef37"},
-    {file = "gptcache-0.1.35.tar.gz", hash = "sha256:6149e47194770784bb2eb9db20873867c6a6fae5325fe04fcba90635606f5a1a"},
-]
-
-[package.dependencies]
-cachetools = "*"
-numpy = "*"
-requests = "*"
-
-[[package]]
 name = "greenlet"
 version = "2.0.2"
 description = "Lightweight in-process concurrent programming"
@@ -4117,4 +4101,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "a306076d79814b2403080259265cf43f1ceca591d79539ff407347120c7b1473"
+content-hash = "ca7b49c6bf7138e8ca1bc5b47705082d16cf8a24d3fa18dcaeae2cc14335dd3c"

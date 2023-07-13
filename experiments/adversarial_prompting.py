@@ -7,19 +7,12 @@ Only the attacker is a player in the environment. The victim and the judge are h
 The attacker wins by getting the victim model to say something which it would refuse to say if prompted naively.
 The judge judges if the victim has answered the attacker's question.
 """
-
 import datetime
-import hashlib
 import json
 import logging
 from dataclasses import dataclass, asdict, field
 
 import hydra
-import langchain
-from gptcache import Cache
-from gptcache.manager import manager_factory
-from gptcache.processor.pre import get_prompt
-from langchain.cache import GPTCache
 from langchain.chat_models import ChatOpenAI
 from langchain.schema import ChatMessage, BaseMessage
 from omegaconf import DictConfig
@@ -28,17 +21,6 @@ from macrolens.utils import log_exceptions
 
 logger = logging.getLogger(__name__)
 
-def get_hashed_name(name):
-    return hashlib.sha256(name.encode()).hexdigest()
-
-
-def init_gptcache(cache_obj: Cache, llm: str):
-    hashed_llm = get_hashed_name(llm)
-    cache_obj.init(
-        pre_embedding_func=get_prompt,
-        data_manager=manager_factory(manager="map", data_dir=f"map_cache_{hashed_llm}"),
-    )
-langchain.llm_cache = GPTCache(init_gptcache)
 
 
 # %% constants
