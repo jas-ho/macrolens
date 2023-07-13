@@ -9,12 +9,18 @@ The judge judges if the victim has answered the attacker's question.
 """
 import datetime
 import json
+import logging
 from dataclasses import dataclass, asdict, field
 
 import hydra
-# %% cache all requests
 import requests_cache
+from langchain.chat_models import ChatOpenAI
+from langchain.schema import ChatMessage, BaseMessage
 from omegaconf import DictConfig
+
+from macrolens.utils import log_exceptions
+
+logger = logging.getLogger(__name__)
 
 requests_cache.install_cache("macrolens_cache")
 
@@ -84,11 +90,6 @@ ATTACKER_MODEL = "gpt-3.5-turbo"
 ATTACKER_TEMP = 0.9
 
 # %% victim model
-from langchain.chat_models import ChatOpenAI
-from langchain.schema import ChatMessage, BaseMessage
-from dotenv import load_dotenv;
-
-load_dotenv()
 
 victim = ChatOpenAI(model_name=VICTIM_MODEL, temperature=VICTIM_TEMP)
 print(victim([ChatMessage(content=REFUSED_QUESTION, role="user")]))
@@ -197,6 +198,7 @@ attacker = Attacker()
 
 # %% basic loop#
 @hydra.main(config_path="conf", config_name="adversarial_prompting")
+@log_exceptions(logger)
 def main(cfg: DictConfig):
     num_steps = 10
     history = History("history.jsonl")
