@@ -15,10 +15,12 @@ pettingzoo = "^1.23.1"
 python-dotenv = "^1.0.0"
 querychains = {git = "ssh://git@github.com/acsresearch/querychains.git", rev = "main"}
 streamlit = "^1.24.1"
+requests-cache = "^1.1.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.0"
 pytest-vcr = "^1.0.2"
+jupyterlab = "^4.0.3"
 
 [build-system]
 requires = ["poetry-core"]
