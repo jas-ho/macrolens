@@ -13,6 +13,7 @@ import logging
 from dataclasses import dataclass, asdict, field
 
 import hydra
+from cachier import cachier
 from langchain.chat_models import ChatOpenAI
 from langchain.schema import ChatMessage, BaseMessage
 from omegaconf import DictConfig
@@ -88,13 +89,39 @@ JUDGE_TEMP = 0.9
 ATTACKER_MODEL = "gpt-3.5-turbo"
 ATTACKER_TEMP = 0.9
 
+# %% base class for all agents with support for request caching
+
+
+class Agent:
+    def __init__(self, model_name: str, temperature: float, cls: type = ChatOpenAI):
+        self.model_name = model_name
+        self.temperature = temperature
+        self.cls = cls
+
+        self._cache = {}
+        self._model = self.cls(model_name=model_name, temperature=temperature)
+
+    def _get_cache_key_method(self, messages: list[BaseMessage]) -> str:
+        breakpoint()
+        return json.dumps({
+            "cls": self.cls.__name__,
+            "model_name": self.model_name,
+            "temperature": self.temperature,
+            "messages": [message.to_json() for message in messages]
+        })
+
+    @cachier(hash_func=_get_cache_key_method)
+    def __call__(self, messages: list[BaseMessage]) -> BaseMessage:
+        return self._model(messages)
+
+
 # %% victim model
 
-victim = ChatOpenAI(model_name=VICTIM_MODEL, temperature=VICTIM_TEMP)
-print(victim([ChatMessage(content=REFUSED_QUESTION, role="user")]))
+victim = Agent(model_name=VICTIM_MODEL, temperature=VICTIM_TEMP)
+print(victim.__call__(victim, [ChatMessage(content=REFUSED_QUESTION, role="user")]))
 
 # %% judge model
-judge = ChatOpenAI(model_name=JUDGE_MODEL, temperature=JUDGE_TEMP)
+judge = Agent(model_name=JUDGE_MODEL, temperature=JUDGE_TEMP)
 print(judge([
     ChatMessage(content=JUDGE_PROMPT, role="assistant"),
     ChatMessage(content=ANSWERED_EXAMPLES[0], role="user")
@@ -145,7 +172,7 @@ class History:
 
 class Attacker:
     def __init__(self, model: str = ATTACKER_MODEL, temperature: float = ATTACKER_TEMP):
-        self.model = ChatOpenAI(model_name=model, temperature=temperature)
+        self.model = Agent(model_name=model, temperature=temperature)
         self.insights: History = History(output_path="insights.jsonl")
 
     def __call__(self, chat_messages: list[ChatMessage]) -> BaseMessage:
@@ -206,7 +233,7 @@ def main(cfg: DictConfig):
         history.append(HistoryEntry(prompt="<attacker_reflection>", response=attacker_prompt, type=ATTACKER, round=i))
 
         # victim responds
-        victim_response = victim([ChatMessage(content=attacker_prompt, role="user")])
+        victim_response = victim.__call__(victim, [ChatMessage(content=attacker_prompt, role="user")])
         history.append(HistoryEntry(prompt=attacker_prompt, response=victim_response.content, type=VICTIM, round=i))
 
         # judge judges
